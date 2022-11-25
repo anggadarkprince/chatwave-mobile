@@ -1,25 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {SafeAreaProvider} from "react-native-safe-area-context";
-import {SplashScreen} from "./src/screens/Splash";
-import {AppNavigator} from "./src/navigation/AppNavigator";
+import React from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {AppNavigator} from './src/navigation/AppNavigator';
+import {Provider} from 'react-redux';
+import {store} from './src/store/store';
+import {LogBox} from 'react-native';
+
+LogBox.ignoreLogs(['AsyncStorage has been extracted']);
 
 const App = () => {
-  const [appIsLoaded, setAppIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setAppIsLoaded(true);
-    }, 2000)
-  }, []);
-
-  if (!appIsLoaded) {
-      return  <SplashScreen />;
-  }
-
-  return appIsLoaded && (
+  return (
+    <Provider store={store}>
       <SafeAreaProvider>
         <AppNavigator />
       </SafeAreaProvider>
+    </Provider>
   );
 };
 export default App;
