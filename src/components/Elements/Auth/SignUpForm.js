@@ -1,13 +1,20 @@
-import React, {useReducer, useCallback} from 'react';
+import React, {useReducer, useCallback, useState, useEffect} from 'react';
 import {SubmitButton} from "../../Buttons";
 import {TextInput} from "../../Inputs";
 import {AtSymbolIcon, IdentificationIcon, LockClosedIcon, UserCircleIcon} from "react-native-heroicons/outline";
 import Colors from "../../Utilities/Colors";
-import {StyleSheet, Text, Linking} from "react-native";
+import {StyleSheet, Text, Linking, Alert, ActivityIndicator} from "react-native";
 import {reducer} from "../../../utils/reducers/formReducer";
 import {validateInput} from "../../../utils/actions/formActions";
+import {signUp} from "../../../utils/actions/authActions";
 
 const initialState = {
+    inputValues: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+    },
     inputErrors: {
         firstName: false,
         lastName: false,
@@ -18,14 +25,42 @@ const initialState = {
 }
 
 const SignUpForm = () => {
+    const [error, setError] = useState();
+    const [isLoading, setIsLoading] = useState(false);
     const [formState, dispatchFormState] = useReducer(reducer, initialState);
 
     const inputChangedHandler = useCallback((inputId, inputValue) => {
         dispatchFormState({
             inputId: inputId,
+            value: inputValue,
             isValid: validateInput(inputId, inputValue)
         });
     }, [dispatchFormState]);
+
+    useEffect(() => {
+        if (error) {
+            Alert.alert("An error occurred", error);
+        }
+    }, [error]);
+
+    const authHandler = async () => {
+        try {
+            setIsLoading(true);
+            await signUp(formState.inputValues);
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                dispatchFormState({
+                    inputId: 'email',
+                    value: formState.inputValues.email,
+                    isValid: error.message
+                });
+            } else {
+                setError(error.message);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <>
@@ -84,12 +119,18 @@ const SignUpForm = () => {
                 </Text>
             </Text>
 
-            <SubmitButton
-                title="Sign Up"
-                onPress={() => console.log("Button pressed")}
-                style={styles.buttonSubmit}
-                disabled={!formState.formIsValid}
-            />
+            {
+                isLoading ? (
+                    <ActivityIndicator color={Colors.primary} style={{marginVertical: 20}} />
+                ) : (
+                    <SubmitButton
+                        title="Sign Up"
+                        onPress={authHandler}
+                        style={styles.buttonSubmit}
+                        disabled={!formState.formIsValid}
+                    />
+                )
+            }
         </>
     )
 };

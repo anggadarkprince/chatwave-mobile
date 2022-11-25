@@ -13,7 +13,7 @@ export const validateString = (id, value) => {
 
     if (value !== "") {
         constraints.format = {
-            pattern: "[a-z]+",
+            pattern: "[a-z ]+",
             flags: "i",
             message: "value can only contain letters"
         }
