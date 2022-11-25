@@ -16,11 +16,11 @@ import Colors from "../../components/Utilities/Colors";
 import SignInForm from "../../components/Elements/Auth/SignInForm";
 import SignUpForm from "../../components/Elements/Auth/SignUpForm";
 
-export const AuthScreen = props => {
+export const AuthScreen = () => {
     const [isSignUp, setIsSignUp] = useState(false);
 
     return (
-        <SafeAreaView style={{flex: 1}}>
+        <SafeAreaView style={styles.container}>
             <StatusBar barStyle={"dark-content"} backgroundColor="white" />
             <PageContainer>
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -39,13 +39,20 @@ export const AuthScreen = props => {
                         {isSignUp ? <SignUpForm /> : <SignInForm />}
 
                         <TouchableOpacity
-                            activeOpacity={0.7}
+                            activeOpacity={0.75}
                             onPress={() => setIsSignUp(prevState => !prevState)}
                             style={styles.linkContainer}
                         >
-                            <Text style={styles.link}>
-                                {isSignUp ? "Already have an account? Login" : "Don't have an account? Register"}
-                            </Text>
+                            {isSignUp ? (
+                                <Text style={styles.text}>
+                                    Already have an account? <Text style={styles.link}>Login</Text>
+                                </Text>
+                            ) : (
+                                <Text style={styles.text}>
+                                    Don't have an account? <Text style={styles.link}>Register</Text>
+                                </Text>
+                            )
+                            }
                         </TouchableOpacity>
                     </KeyboardAvoidingView>
                 </ScrollView>
@@ -55,15 +62,21 @@ export const AuthScreen = props => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     linkContainer: {
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 15
     },
+    text: {
+        color: Colors.dark,
+        fontFamily: 'Poppins-Regular',
+    },
     link: {
         color: Colors.primary,
         fontFamily: 'Poppins-Regular',
-        letterSpacing: 0.3
     },
     imageContainer: {
         justifyContent: 'center',

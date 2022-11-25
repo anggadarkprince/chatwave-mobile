@@ -1,19 +1,37 @@
 import { StyleSheet, Text, TextInput as TextInputNative, View } from "react-native"
 import Colors from "../Utilities/Colors";
-import React from "react";
+import React, {useState} from "react";
+import {validate} from "validate.js";
 
-export const TextInput = ({label, icon, errorText, ...rest}) => {
+export const TextInput = ({id, label, icon, errorText, onInputChanged, constraints, singleError, ...rest}) => {
+    const [isFocus, setIsFocus] = useState(false);
+
+    const onChangeText = text => {
+        if (onInputChanged) {
+            onInputChanged(id, text, constraints);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, isFocus && styles.inputFocus, errorText && styles.inputError]}>
                 {icon && <View style={styles.icon}>{icon}</View>}
-                <TextInputNative style={styles.input} placeholderTextColor={Colors.lightGray} {...rest} />
+                <TextInputNative
+                    style={styles.input}
+                    placeholderTextColor={Colors.lightGray}
+                    onChangeText={onChangeText}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    {...rest}
+                />
             </View>
             {
                 errorText && (
                     <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>{errorText}</Text>
+                        {validate.isString(errorText) || (validate.isArray(errorText) && errorText.length === 1) ? <Text style={styles.errorText}>{errorText}</Text> : (
+                            singleError ? <Text style={styles.errorText}>{errorText[0]}</Text> :  errorText.map((error, index) => <Text key={index} style={styles.errorText}>• {error}</Text>)
+                        )}
                     </View>
                 )
             }
@@ -38,7 +56,15 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#f5f5f5',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#f5f5f5',
+    },
+    inputFocus: {
+        borderColor: Colors.primary,
+    },
+    inputError: {
+        borderColor: Colors.danger,
     },
     icon: {
         marginRight: 10,

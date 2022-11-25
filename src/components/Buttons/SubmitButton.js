@@ -4,19 +4,21 @@ import Colors from "../Utilities/Colors";
 
 export const SubmitButton = props => {
     const enabledBgColor = props.color || Colors.primary;
-    const disabledBgColor = Colors.lightGray;
+    const disabledBgColor = Colors.fade;
     const bgColor = props.disabled ? disabledBgColor : enabledBgColor;
 
     return (
         <TouchableOpacity
+            activeOpacity={0.8}
+            disabled={props.disabled}
             onPress={props.disabled ? () => {} : props.onPress}
             style={{
                 ...styles.button,
                 ...props.style,
-                ...{ backgroundColor: bgColor
-            }}}
+                ...{backgroundColor: bgColor}
+            }}
         >
-            <Text style={[styles.buttonText, props.disabled && {color:  Colors.grey}]}>
+            <Text style={[styles.buttonText, props.disabled && {color:  Colors.gray}]}>
                 {props.title}
             </Text>
         </TouchableOpacity>
