@@ -1,10 +1,6 @@
 import {getFirebaseApp} from '../firebaseHelper';
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
-import {child, ref, set, getDatabase} from 'firebase/database';
+import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword,} from 'firebase/auth';
+import {child, getDatabase, ref, set, update} from 'firebase/database';
 import {authenticate, logout} from '../../store/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserData} from './userActions';
@@ -104,6 +100,14 @@ const createUser = async ({firstName, lastName, email, userId}) => {
   await set(childRef, userData);
   return userData;
 };
+
+export const updateSignedInUserData = async (userId, newData) => {
+  newData.fullName = `${newData.firstName} ${newData.lastName}`.toLowerCase();
+
+  const dbRef = ref(getDatabase());
+  const childRef = child(dbRef, `users/${userId}`);
+  await update(childRef, newData);
+}
 
 const saveDataToStorage = async (token, userId, expiryDate) => {
   await AsyncStorage.setItem(

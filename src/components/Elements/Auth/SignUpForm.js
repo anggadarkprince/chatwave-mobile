@@ -140,16 +140,13 @@ const SignUpForm = () => {
         </Text>
       </Text>
 
-      {isLoading ? (
-        <ActivityIndicator color={Colors.primary} style={styles.spinner} />
-      ) : (
-        <SubmitButton
-          title="Sign Up"
-          onPress={authHandler}
-          style={styles.buttonSubmit}
-          disabled={!formState.formIsValid}
-        />
-      )}
+      <SubmitButton
+        title="Sign Up"
+        loading={isLoading}
+        onPress={authHandler}
+        style={styles.buttonSubmit}
+        disabled={!formState.formIsValid}
+      />
     </>
   );
 };

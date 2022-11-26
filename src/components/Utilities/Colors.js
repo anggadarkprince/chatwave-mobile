@@ -9,4 +9,5 @@ export default {
   dark: '#242424',
   black: '#000',
   danger: '#fd6666',
+  success: '#4fca71',
 };

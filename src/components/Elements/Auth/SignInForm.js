@@ -119,15 +119,12 @@ const SignInForm = () => {
         onPress={() => console.log('Open forgot password screen')}>
         <Text style={styles.linkForgot}>Forgot Password?</Text>
       </TouchableOpacity>
-      {isLoading ? (
-        <ActivityIndicator color={Colors.primary} style={styles.spinner} />
-      ) : (
-        <SubmitButton
-          title="Sign In"
-          onPress={onSignIn}
-          style={styles.buttonSubmit}
-        />
-      )}
+      <SubmitButton
+        title="Sign In"
+        loading={isLoading}
+        onPress={onSignIn}
+        style={styles.buttonSubmit}
+      />
     </>
   );
 };

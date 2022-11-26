@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {StyleSheet, TouchableOpacity, Text, ActivityIndicator} from 'react-native';
 import Colors from '../Utilities/Colors';
 
 export const SubmitButton = props => {
@@ -10,16 +10,20 @@ export const SubmitButton = props => {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      disabled={props.disabled}
+      disabled={props.disabled || props.loading}
       onPress={props.disabled ? () => {} : props.onPress}
       style={{
         ...styles.button,
         ...props.style,
         ...{backgroundColor: bgColor},
       }}>
-      <Text style={[styles.buttonText, props.disabled && {color: Colors.gray}]}>
-        {props.title}
-      </Text>
+        {props.loading ? (
+            <ActivityIndicator size={'small'} color={Colors.white} style={{marginVertical: 3}} />
+        ) : (
+            <Text style={[styles.buttonText, props.disabled && {color: Colors.gray}]}>
+                {props.title}
+            </Text>
+        )}
     </TouchableOpacity>
   );
 };
@@ -27,7 +31,7 @@ export const SubmitButton = props => {
 const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 30,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',

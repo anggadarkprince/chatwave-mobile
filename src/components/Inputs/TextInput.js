@@ -19,8 +19,10 @@ export const TextInput = ({
   ...rest
 }) => {
   const [isFocus, setIsFocus] = useState(false);
+  const [value, setValue] = useState(rest.initialValue)
 
   const onChangeText = text => {
+    setValue(text);
     if (onInputChanged) {
       onInputChanged(id, text, constraints);
     }
@@ -48,6 +50,7 @@ export const TextInput = ({
           onChangeText={onChangeText}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
+          value={value}
           {...rest}
         />
       </View>
