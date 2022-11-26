@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native"
 import React from "react";
 import Colors from "../Utilities/Colors";
+import {HeaderButton} from "react-navigation-header-buttons";
+import {HeroIcon} from "../Icons";
 
 export const PageTitle = props => {
     return (
@@ -8,7 +10,18 @@ export const PageTitle = props => {
             <Text style={styles.text}>{props.text}</Text>
         </View>
     );
-}
+};
+
+export const CustomHeaderButton = props => {
+    return (
+        <HeaderButton
+            { ...props }
+            IconComponent={HeroIcon}
+            iconSize={23}
+            color={props.color ?? Colors.primary }
+        />
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
