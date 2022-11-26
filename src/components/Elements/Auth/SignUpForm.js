@@ -47,7 +47,7 @@ const SignUpForm = () => {
       dispatchFormState({
         inputId: inputId,
         value: inputValue,
-        isValid: validateInput(inputId, inputValue),
+        validationResult: validateInput(inputId, inputValue),
       });
     },
     [dispatchFormState],
@@ -69,7 +69,7 @@ const SignUpForm = () => {
         dispatchFormState({
           inputId: 'email',
           value: formState.inputValues.email,
-          isValid: e.message,
+          validationResult: e.message,
         });
       } else {
         setError(e.message);

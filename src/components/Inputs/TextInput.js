@@ -35,9 +35,15 @@ export const TextInput = ({
           isFocus && styles.inputFocus,
           errorText && styles.inputError,
         ]}>
-        {icon && <View style={styles.icon}>{icon}</View>}
+        {icon && <View style={[
+            styles.icon,
+            rest.numberOfLines > 1 ? styles.iconAlignTop : {},
+        ]}>{icon}</View>}
         <TextInputNative
-          style={styles.input}
+          style={[
+              styles.input,
+              rest.numberOfLines > 1 ? styles.inputAlignTop : {},
+          ]}
           placeholderTextColor={Colors.lightGray}
           onChangeText={onChangeText}
           onFocus={() => setIsFocus(true)}
@@ -110,5 +116,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Poppins-Regular',
     letterSpacing: 0.3,
+  },
+  inputAlignTop: {
+    textAlignVertical: 'top',
+    alignSelf: 'flex-start'
+  },
+  iconAlignTop: {
+    alignSelf: 'flex-start',
+    marginTop: 11,
   },
 });

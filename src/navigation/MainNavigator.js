@@ -3,8 +3,8 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {HomeScreen} from '../screens/Home';
 import {StyleSheet, Text} from 'react-native';
 import {
-  ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
+    ChatBubbleLeftEllipsisIcon,
+    Cog6ToothIcon, HeartIcon, UserGroupIcon,
 } from 'react-native-heroicons/outline';
 import {SettingScreen} from '../screens/Setting';
 import React from 'react';
@@ -43,6 +43,42 @@ const TabNavigator = () => {
               size={25}
               color={focused ? '#ee4a63' : '#2d2d2d'}
             />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Groups"
+        component={SettingScreen}
+        options={{
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={[
+                styles.tabBarLabel,
+                {color: focused ? '#ee4a63' : '#545454'},
+              ]}>
+              Groups
+            </Text>
+          ),
+          tabBarIcon: ({focused}) => (
+            <UserGroupIcon size={25} color={focused ? '#ee4a63' : '#2d2d2d'} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Status"
+        component={SettingScreen}
+        options={{
+          tabBarLabel: ({focused}) => (
+            <Text
+              style={[
+                styles.tabBarLabel,
+                {color: focused ? '#ee4a63' : '#545454'},
+              ]}>
+              Status
+            </Text>
+          ),
+          tabBarIcon: ({focused}) => (
+            <HeartIcon size={25} color={focused ? '#ee4a63' : '#2d2d2d'} />
           ),
         }}
       />

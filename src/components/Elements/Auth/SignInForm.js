@@ -42,7 +42,7 @@ const SignInForm = () => {
       dispatchFormState({
         inputId: inputId,
         value: inputValue,
-        isValid: validate(inputValue, constraints),
+        validationResult: validate(inputValue, constraints),
       });
     },
     [dispatchFormState],
@@ -65,7 +65,7 @@ const SignInForm = () => {
         dispatchFormState({
           inputId: 'email',
           value: formState.inputValues.email,
-          isValid: e.message,
+          validationResult: e.message,
         });
       } else {
         setError(e.message);
