@@ -11,12 +11,18 @@ import {useDispatch, useSelector} from 'react-redux';
 import {reducer} from '../../utils/reducers/formReducer';
 import {updateLoggedInUserData} from '../../store/authSlice';
 import {updateSignedInUserData, userLogout} from "../../utils/actions/authActions";
+import {ProfileImage} from "../../components/Images";
 
 export const SettingScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const userData = useSelector(state => state.auth.userData);
     const dispatch = useDispatch();
+
+    const firstName = userData.firstName || "";
+    const lastName = userData.lastName || "";
+    const email = userData.email || "";
+    const about = userData.about || "";
 
     const initialState = {
         inputValues: {
@@ -62,17 +68,29 @@ export const SettingScreen = () => {
         }
     }, [dispatch, formState.inputValues]);
 
+    const hasChanges = () => {
+        const currentValues = formState.inputValues;
+
+        return currentValues.firstName !== firstName
+            || currentValues.lastName !== lastName
+            || currentValues.email !== email
+            || currentValues.about !== about;
+    }
+
     return (
         <PageContainer>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <PageTitle text="Settings" />
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formContainer}>
                 <KeyboardAvoidingView
                     style={styles.keyboardAvoidingView}
                     behavior={Platform.OS === 'ios' ? 'height' : undefined}
                     keyboardVerticalOffset={100}>
                 </KeyboardAvoidingView>
-                <PageTitle text="Settings" />
+
+                <ProfileImage size={90} userId={userData.userId} uri={userData.profilePicture} />
 
                 {showSuccessMessage && <Text style={styles.textSuccess}>User successfully updated!</Text>}
+
                 <TextInput
                     id="firstName"
                     label="First name"
@@ -114,18 +132,18 @@ export const SettingScreen = () => {
                     errorText={formState.inputErrors?.about}
                     initialValue={userData.about} />
 
-                <SubmitButton
+                {hasChanges() && <SubmitButton
                     title="Save"
                     loading={isLoading}
                     onPress={saveHandler}
-                    style={{marginTop: 20}}
+                    style={{marginTop: 20, width: 170}}
                     color={Colors.success}
-                    disabled={!formState.formIsValid}/>
+                    disabled={!formState.formIsValid}/>}
 
                 <SubmitButton
                     title="Logout"
                     onPress={() => dispatch(userLogout())}
-                    style={{marginTop: 10, marginBottom: 20}}
+                    style={{marginTop: 20, marginBottom: 20, width: 170}}
                     color={Colors.danger}
                     disabled={isLoading} />
             </ScrollView>
@@ -146,5 +164,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         backgroundColor: '#4fca7122',
         borderRadius: 8,
+    },
+    formContainer: {
+        alignItems: 'center'
     }
 });

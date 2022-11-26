@@ -102,7 +102,9 @@ const createUser = async ({firstName, lastName, email, userId}) => {
 };
 
 export const updateSignedInUserData = async (userId, newData) => {
-  newData.fullName = `${newData.firstName} ${newData.lastName}`.toLowerCase();
+  if (newData.firstName && newData.lastName) {
+    newData.fullName = `${newData.firstName} ${newData.lastName}`.toLowerCase();
+  }
 
   const dbRef = ref(getDatabase());
   const childRef = child(dbRef, `users/${userId}`);

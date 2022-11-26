@@ -3,9 +3,11 @@ import React from "react";
 import Colors from "../Utilities/Colors";
 
 export const PageTitle = props => {
-    return <View style={styles.container}>
-        <Text style={styles.text}>{props.text}</Text>
-    </View>
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>{props.text}</Text>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -16,6 +18,6 @@ const styles = StyleSheet.create({
         fontSize: 28,
         color: Colors.dark,
         fontFamily: 'Poppins-Bold',
-        letterSpacing: 0.2
+        letterSpacing: 0.1
     }
 })
