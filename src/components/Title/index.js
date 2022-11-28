@@ -17,7 +17,7 @@ export const CustomHeaderButton = props => {
         <HeaderButton
             { ...props }
             IconComponent={HeroIcon}
-            iconSize={23}
+            iconSize={24}
             color={props.color ?? Colors.primary }
         />
     );

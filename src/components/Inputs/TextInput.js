@@ -16,6 +16,7 @@ export const TextInput = ({
   onInputChanged,
   constraints,
   singleError,
+  style,
   ...rest
 }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -29,8 +30,8 @@ export const TextInput = ({
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.container, rest.containerStyle]}>
+      {label && <Text style={styles.label}>{label}</Text>}
       <View
         style={[
           styles.inputContainer,
@@ -43,8 +44,10 @@ export const TextInput = ({
         ]}>{icon}</View>}
         <TextInputNative
           style={[
-              styles.input,
-              rest.numberOfLines > 1 ? styles.inputAlignTop : {},
+            styles.input,
+            rest.numberOfLines > 1 ? styles.inputAlignTop : {},
+            icon && {paddingStart: 0},
+            style,
           ]}
           placeholderTextColor={Colors.lightGray}
           onChangeText={onChangeText}
@@ -76,7 +79,7 @@ export const TextInput = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    flex: 1,
     marginBottom: 12,
   },
   label: {
@@ -87,7 +90,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    paddingHorizontal: 10,
     borderRadius: 5,
     backgroundColor: '#f5f5f5',
     flexDirection: 'row',
@@ -102,14 +104,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.danger,
   },
   icon: {
-    marginRight: 10,
+    marginHorizontal: 10,
     color: Colors.lightGray,
   },
   input: {
     color: Colors.dark,
     flex: 1,
     fontFamily: 'Poppins-Regular',
-    letterSpacing: 0.3,
+    letterSpacing: 0.1,
+    verticalAlign: 'middle',
+    paddingHorizontal: 15,
+    borderRadius: 5,
   },
   errorContainer: {
     marginVertical: 5,

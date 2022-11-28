@@ -12,7 +12,7 @@ export const HomeScreen = ({navigation}) => {
                         <Item
                             title="New chat"
                             iconName="pencil-square"
-                            onPress={() => {}}/>
+                            onPress={() => navigation.navigate("NewChat")}/>
                     </HeaderButtons>
                 )
             }

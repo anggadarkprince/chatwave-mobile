@@ -9,6 +9,7 @@ import {
 import {SettingScreen} from '../screens/Setting';
 import React from 'react';
 import {ChatScreen} from '../screens/Chat';
+import {NewChatScreen} from "../screens/Chat/NewChat";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -107,16 +108,24 @@ const TabNavigator = () => {
 export const MainNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={TabNavigator}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{title: '', headerBackTitle: 'Back'}}
-      />
+      <Stack.Group>
+        <Stack.Screen
+            name="Home"
+            component={TabNavigator}
+            options={{headerShown: false}}
+        />
+        <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
+            options={{title: '', headerBackTitle: 'Back'}}
+        />
+      </Stack.Group>
+      <Stack.Group screenOptions={{presentation: 'containedModal'}}>
+         <Stack.Screen
+           name="NewChat"
+           component={NewChatScreen}
+         />
+      </Stack.Group>
     </Stack.Navigator>
   );
 };

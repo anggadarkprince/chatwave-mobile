@@ -87,7 +87,7 @@ export const SettingScreen = () => {
                     keyboardVerticalOffset={100}>
                 </KeyboardAvoidingView>
 
-                <ProfileImage size={90} userId={userData.userId} uri={userData.profilePicture} />
+                <ProfileImage size={90} userId={userData.userId} uri={userData.profilePicture} showEditButton />
 
                 {showSuccessMessage && <Text style={styles.textSuccess}>User successfully updated!</Text>}
 
