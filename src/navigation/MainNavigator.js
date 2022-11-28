@@ -1,7 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {HomeScreen} from '../screens/Home';
-import {StyleSheet, Text, ActivityIndicator, View} from 'react-native';
+import {StyleSheet, Text, ActivityIndicator, View, Image} from 'react-native';
 import {
   ChatBubbleLeftEllipsisIcon,
   Cog6ToothIcon,
@@ -17,7 +17,8 @@ import {getFirebaseApp} from '../utils/firebaseHelper';
 import {getDatabase, ref, child, onValue, off, get} from '@firebase/database';
 import {setChatsData} from '../store/chatSlice';
 import Colors from '../components/Utilities/Colors';
-import {setStoredUsers} from "../store/userSlice";
+import {setStoredUsers} from '../store/userSlice';
+import {setChatMessages} from '../store/messagesSlice';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -26,7 +27,14 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerTitle: '',
+        headerLeft: () => (
+          <Image
+            source={require('../../assets/images/chatwave.png')}
+            style={{width: 28, height: 28, borderRadius: 5, marginStart: 20}}
+          />
+        ),
+        headerTitle: 'ChatWave',
+        headerTintColor: Colors.primary,
         tabBarActiveTintColor: '#ee4a63',
         tabBarStyle: {
           paddingTop: 10,
@@ -181,6 +189,14 @@ export const MainNavigator = () => {
             dispatch(setChatsData({chatsData}));
             setIsLoading(false);
           }
+        });
+
+        const messagesRef = child(dbRef, `messages/${chatId}`);
+        refs.push(messagesRef);
+
+        onValue(messagesRef, messagesSnapshot => {
+          const messagesData = messagesSnapshot.val();
+          dispatch(setChatMessages({chatId, messagesData}));
         });
 
         if (chatsFoundCount === 0) {

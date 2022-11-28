@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
-  Text,
 } from 'react-native';
 import React, {useState, useCallback, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -18,13 +17,14 @@ import Colors from '../../components/Utilities/Colors';
 import {useSelector} from 'react-redux';
 import {PageContainer} from '../../components/Containers';
 import {Bubble} from '../../components/Chats';
-import {createChat} from '../../utils/actions/chatActions';
+import {createChat, sendTextMessage} from '../../utils/actions/chatActions';
 
 export const ChatScreen = ({route, navigation}) => {
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.users.storedUsers);
   const storedChats = useSelector(state => state.chats.chatsData);
-
+  const chatMessages = useSelector(state => state.messages.messagesData);
+console.log(chatMessages);
   const [chatUsers, setChatUsers] = useState([]);
   const [messageText, setMessageText] = useState('');
   const [chatId, setChatId] = useState(route?.params?.chatId);
@@ -55,6 +55,7 @@ export const ChatScreen = ({route, navigation}) => {
         console.log(id);
         setChatId(id);
       }
+      await sendTextMessage(chatId, userData.userId, messageText);
     } catch (error) {
       console.log(error);
     }

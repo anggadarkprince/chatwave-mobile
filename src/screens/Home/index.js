@@ -64,7 +64,7 @@ export const HomeScreen = ({navigation, route}) => {
           }
 
           const title = `${otherUser.firstName} ${otherUser.lastName}`;
-          const subTitle = 'This will be a message...';
+          const subTitle = chatData.latestMessageText || 'A new chat message';
           const image = otherUser.profilePicture;
 
           return (
