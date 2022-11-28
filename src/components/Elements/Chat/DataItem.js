@@ -1,35 +1,28 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
-import Colors from "../../Utilities/Colors";
-import {ProfileImage} from "../../Images";
+import Colors from '../../Utilities/Colors';
+import {ProfileImage} from '../../Images';
 
 export const DataItem = props => {
-  const {title, subTitle, image} = props;
+  const {title, subTitle, image, onPress} = props;
 
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        <ProfileImage
-          uri={image}
-          size={42}
-        />
+        <ProfileImage uri={image} size={42} />
 
         <View style={styles.textContainer}>
-          <Text
-            numberOfLines={1}
-            style={styles.title}>
+          <Text numberOfLines={1} style={styles.title}>
             {title}
           </Text>
-          <Text
-            numberOfLines={1}
-            style={styles.subTitle}>
+          <Text numberOfLines={1} style={styles.subTitle}>
             {subTitle}
           </Text>
         </View>
       </View>
     </TouchableWithoutFeedback>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -38,10 +31,10 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.light,
     borderBottomWidth: 1,
     alignItems: 'center',
-    minHeight: 50
+    minHeight: 50,
   },
   textContainer: {
-    marginLeft: 14
+    marginLeft: 14,
   },
   title: {
     fontFamily: 'Poppins-Medium',
@@ -54,5 +47,5 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     fontSize: 13,
     lineHeight: 18,
-  }
+  },
 });

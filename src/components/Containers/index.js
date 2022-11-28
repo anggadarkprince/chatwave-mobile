@@ -3,9 +3,7 @@ import React from 'react';
 
 export const PageContainer = props => {
   return (
-    <View style={{...styles.container, ...props.style}}>
-      {props.children}
-    </View>
+    <View style={{...styles.container, ...props.style}}>{props.children}</View>
   );
 };
 
