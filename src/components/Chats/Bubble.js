@@ -7,6 +7,7 @@ export const Bubble = props => {
 
   const bubbleStyle = {...styles.container};
   const textStyle = {...styles.text};
+  const wrapperStyle = {...styles.wrapperStyle};
 
   switch (type) {
     case 'system':
@@ -15,13 +16,27 @@ export const Bubble = props => {
       bubbleStyle.alignItems = 'center';
       bubbleStyle.marginTop = 10;
       break;
-
+    case 'error':
+      textStyle.color = Colors.white;
+      bubbleStyle.backgroundColor = Colors.danger;
+      bubbleStyle.alignItems = 'center';
+      bubbleStyle.marginTop = 10;
+      break;
+    case 'myMessage':
+      wrapperStyle.justifyContent = 'flex-end';
+      bubbleStyle.backgroundColor = '#E7FED6';
+      bubbleStyle.maxWidth = '90%';
+      break;
+    case 'theirMessage':
+      wrapperStyle.justifyContent = 'flex-start';
+      bubbleStyle.maxWidth = '90%';
+      break;
     default:
       break;
   }
 
   return (
-    <View style={styles.wrapperStyle}>
+    <View style={wrapperStyle}>
       <View style={bubbleStyle}>
         <Text style={textStyle}>{text}</Text>
       </View>
@@ -32,13 +47,13 @@ export const Bubble = props => {
 const styles = StyleSheet.create({
   wrapperStyle: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   container: {
     backgroundColor: Colors.white,
     borderRadius: 6,
     paddingVertical: 5,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     marginBottom: 10,
     borderColor: Colors.fade,
     borderWidth: 1,
