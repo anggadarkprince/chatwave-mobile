@@ -9,7 +9,11 @@ import {
 } from 'react-native-popup-menu';
 import {v4 as uuidv4} from 'uuid';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {DocumentDuplicateIcon, StarIcon} from 'react-native-heroicons/outline';
+import {
+  ArrowUturnLeftIcon,
+  DocumentDuplicateIcon,
+  StarIcon,
+} from 'react-native-heroicons/outline';
 import {StarIcon as StarFilledIcon} from 'react-native-heroicons/solid';
 import {starMessage} from '../../utils/actions/chatActions';
 import {useSelector} from 'react-redux';
@@ -21,7 +25,7 @@ function formatAmPm(dateString) {
   var ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
   return hours + ':' + minutes + ' ' + ampm;
 }
 
@@ -39,11 +43,12 @@ const MenuItem = props => {
 };
 
 export const Bubble = props => {
-  const {text, type, messageId, userId, chatId, date} = props;
+  const {text, type, messageId, userId, chatId, date, setReply, replyingTo, name} = props;
 
   const starredMessages = useSelector(
     state => state.messages.starredMessages[chatId] ?? {},
   );
+  const storedUsers = useSelector(state => state.users.storedUsers);
 
   const bubbleStyle = {...styles.container};
   const textStyle = {...styles.text};
@@ -54,7 +59,7 @@ export const Bubble = props => {
 
   let Container = View;
   let isUserMessage = false;
-  const dateString = formatAmPm(date);
+  const dateString = date && formatAmPm(date);
 
   switch (type) {
     case 'system':
@@ -82,6 +87,9 @@ export const Bubble = props => {
       Container = TouchableOpacity;
       isUserMessage = true;
       break;
+    case 'reply':
+      bubbleStyle.backgroundColor = '#f2f2f2';
+      break;
     default:
       break;
   }
@@ -96,18 +104,33 @@ export const Bubble = props => {
 
   const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
   const Star = isStarred ? StarFilledIcon : StarIcon;
+  const replyingToUser = replyingTo && storedUsers[replyingTo.sentBy];
+
   return (
     <View style={wrapperStyle}>
       <Container
         onLongPress={openContextMenu}
+        disable={!isUserMessage}
         activeOpacity={0.8}
-        style={[styles.menuContainer, wrapperStyle]}>
+        style={[type !== 'reply' && styles.menuContainer, wrapperStyle]}>
         <View style={bubbleStyle}>
+          {name && <Text style={styles.name}>{name}</Text>}
+          {replyingToUser && (
+            <Bubble
+              type="reply"
+              text={replyingTo.text}
+              name={`${replyingToUser.firstName} ${replyingToUser.lastName}`}
+            />
+          )}
           <Text style={textStyle}>{text}</Text>
 
           <View style={styles.timeContainer}>
             {isStarred && <StarFilledIcon size={15} color={Colors.primary} />}
-            <Text style={[styles.time, isStarred && {marginLeft: 5}]}>{dateString}</Text>
+            {dateString && (
+              <Text style={[styles.time, isStarred && {marginLeft: 5}]}>
+                {dateString}
+              </Text>
+            )}
           </View>
 
           <Menu name={id.current} ref={menuRef}>
@@ -132,6 +155,11 @@ export const Bubble = props => {
                 onSelect={() => starMessage(messageId, chatId, userId)}
                 textStyle={{color: isStarred ? Colors.primary : Colors.dark}}
               />
+              <MenuItem
+                text="Reply"
+                icon={<ArrowUturnLeftIcon size={20} color={Colors.dark} />}
+                onSelect={setReply}
+              />
             </MenuOptions>
           </Menu>
         </View>
@@ -153,6 +181,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: Colors.fade,
     borderWidth: 1,
+    flexShrink: 1,
   },
   text: {
     fontFamily: 'Poppins-Regular',
@@ -177,7 +206,11 @@ const styles = StyleSheet.create({
   },
   time: {
     fontFamily: 'Poppins-Regular',
-    letterSpacing: 0.3,
+    color: Colors.gray,
+    fontSize: 12,
+  },
+  name: {
+    fontFamily: 'Poppins-Medium',
     color: Colors.gray,
     fontSize: 12,
   },

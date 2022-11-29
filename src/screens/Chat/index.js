@@ -6,6 +6,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   FlatList,
+  Text,
 } from 'react-native';
 import React, {useState, useCallback, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -17,7 +18,7 @@ import {
 import Colors from '../../components/Utilities/Colors';
 import {useSelector} from 'react-redux';
 import {PageContainer} from '../../components/Containers';
-import {Bubble} from '../../components/Chats';
+import {Bubble, ReplyTo} from '../../components/Chats';
 import {createChat, sendTextMessage} from '../../utils/actions/chatActions';
 
 export const ChatScreen = ({route, navigation}) => {
@@ -29,6 +30,7 @@ export const ChatScreen = ({route, navigation}) => {
   const [messageText, setMessageText] = useState('');
   const [chatId, setChatId] = useState(route?.params?.chatId);
   const [errorBannerText, setErrorBannerText] = useState('');
+  const [replyingTo, setReplyingTo] = useState();
 
   const chatMessages = useSelector(state => {
     if (!chatId) {
@@ -79,8 +81,14 @@ export const ChatScreen = ({route, navigation}) => {
         console.log(id);
         setChatId(id);
       }
-      await sendTextMessage(chatId, userData.userId, messageText);
+      await sendTextMessage(
+        chatId,
+        userData.userId,
+        messageText,
+        replyingTo && replyingTo.key,
+      );
       setMessageText('');
+      setReplyingTo(null);
     } catch (error) {
       console.log(error);
       setErrorBannerText('Message failed to send');
@@ -104,6 +112,7 @@ export const ChatScreen = ({route, navigation}) => {
           {chatId && (
             <FlatList
               showsVerticalScrollIndicator={false}
+              contentContainerStyle={{paddingVertical: 15}}
               data={chatMessages}
               renderItem={itemData => {
                 const message = itemData.item;
@@ -117,12 +126,24 @@ export const ChatScreen = ({route, navigation}) => {
                     messageId={message.key}
                     userId={userData.userId}
                     chatId={chatId}
+                    setReply={() => setReplyingTo(message)}
+                    replyingTo={
+                      message.replyTo &&
+                      chatMessages.find(i => i.key === message.replyTo)
+                    }
                   />
                 );
               }}
             />
           )}
         </PageContainer>
+        {replyingTo && (
+          <ReplyTo
+            user={storedUsers[replyingTo.sentBy]}
+            text={replyingTo.text}
+            onCancel={() => setReplyingTo(null)}
+          />
+        )}
 
         <View style={styles.inputContainer}>
           <TouchableOpacity activeOpacity={0.7} style={styles.mediaButton}>
@@ -168,7 +189,6 @@ const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
     backgroundColor: 'transparent',
-    paddingTop: 10,
   },
   inputContainer: {
     flexDirection: 'row',
