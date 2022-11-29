@@ -68,6 +68,9 @@ export const ChatScreen = ({route, navigation}) => {
   }, [chatData.users, chatUsers]);
 
   const sendMessage = useCallback(async () => {
+    if (!messageText || messageText === '') {
+      return;
+    }
     try {
       let id = chatId;
       if (!id) {
@@ -100,6 +103,7 @@ export const ChatScreen = ({route, navigation}) => {
           )}
           {chatId && (
             <FlatList
+              showsVerticalScrollIndicator={false}
               data={chatMessages}
               renderItem={itemData => {
                 const message = itemData.item;
