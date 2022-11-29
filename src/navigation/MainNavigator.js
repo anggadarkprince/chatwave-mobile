@@ -18,7 +18,7 @@ import {getDatabase, ref, child, onValue, off, get} from '@firebase/database';
 import {setChatsData} from '../store/chatSlice';
 import Colors from '../components/Utilities/Colors';
 import {setStoredUsers} from '../store/userSlice';
-import {setChatMessages} from '../store/messagesSlice';
+import {setChatMessages, setStarredMessages} from '../store/messagesSlice';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -203,6 +203,16 @@ export const MainNavigator = () => {
           setIsLoading(false);
         }
       }
+    });
+
+    const userStarredMessagesRef = child(
+      dbRef,
+      `userStarredMessages/${userData.userId}`,
+    );
+    refs.push(userStarredMessagesRef);
+    onValue(userStarredMessagesRef, querySnapshot => {
+      const starredMessages = querySnapshot.val() ?? {};
+      dispatch(setStarredMessages({starredMessages}));
     });
 
     return () => {
