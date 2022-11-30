@@ -15,8 +15,6 @@ export const HomeScreen = ({navigation, route}) => {
     return Object.values(chatsData);
   });
 
-  console.log(storedUsers);
-
   useEffect(() => {
     if (selectedUser) {
       const chatUsers = [selectedUser, userData.userId];

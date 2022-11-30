@@ -6,9 +6,10 @@ import {
   Platform,
   KeyboardAvoidingView,
   FlatList,
-  Text,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useRef} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   CameraIcon,
@@ -19,7 +20,13 @@ import Colors from '../../components/Utilities/Colors';
 import {useSelector} from 'react-redux';
 import {PageContainer} from '../../components/Containers';
 import {Bubble, ReplyTo} from '../../components/Chats';
-import {createChat, sendTextMessage} from '../../utils/actions/chatActions';
+import {createChat, sendImageMessage, sendTextMessage} from '../../utils/actions/chatActions';
+import {
+  launchCameraPicker,
+  launchImagePicker,
+  uploadImageAsync,
+} from '../../utils/imagePickerHelper';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 export const ChatScreen = ({route, navigation}) => {
   const userData = useSelector(state => state.auth.userData);
@@ -31,6 +38,10 @@ export const ChatScreen = ({route, navigation}) => {
   const [chatId, setChatId] = useState(route?.params?.chatId);
   const [errorBannerText, setErrorBannerText] = useState('');
   const [replyingTo, setReplyingTo] = useState();
+  const [tempImageUri, setTempImageUri] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const flatList = useRef();
 
   const chatMessages = useSelector(state => {
     if (!chatId) {
@@ -96,6 +107,58 @@ export const ChatScreen = ({route, navigation}) => {
     }
   }, [messageText, chatId]);
 
+  const pickImage = useCallback(async () => {
+    const result = await launchImagePicker();
+    if (result.error) {
+      console.log(result.error);
+    } else {
+      if (!result.didCancel && result.assets) {
+        const tempUri = result.assets[0].uri;
+        setTempImageUri(tempUri);
+      }
+    }
+  }, []);
+
+  const takePhoto = useCallback(async () => {
+    const result = await launchCameraPicker();
+    if (result.error) {
+      console.log(result.error);
+    } else {
+      if (!result.didCancel && result.assets) {
+        const tempUri = result.assets[0].uri;
+        setTempImageUri(tempUri);
+      }
+    }
+  }, []);
+
+  const uploadImage = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      let id = chatId;
+      if (!id) {
+        // no chat id, create the chat
+        id = await createChat(userData.userId, route.params.newChatData);
+        console.log(id);
+        setChatId(id);
+      }
+
+      const uploadUrl = await uploadImageAsync(tempImageUri, true);
+      await sendImageMessage(
+        chatId,
+        userData.userId,
+        null,
+        uploadUrl,
+        replyingTo,
+      );
+      setIsLoading(false);
+      setReplyingTo(null);
+      setTimeout(() => setTempImageUri(''), 500);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  }, [tempImageUri, chatId]);
+
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left', 'bottom']}>
       <KeyboardAvoidingView
@@ -111,6 +174,9 @@ export const ChatScreen = ({route, navigation}) => {
           )}
           {chatId && (
             <FlatList
+              ref={(ref) => flatList.current = ref}
+              onContentSizeChange={() => flatList.current.scrollToEnd({animated: false})}
+              onLayout={() => flatList.current.scrollToEnd({animated: false})}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{paddingVertical: 15}}
               data={chatMessages}
@@ -131,6 +197,7 @@ export const ChatScreen = ({route, navigation}) => {
                       message.replyTo &&
                       chatMessages.find(i => i.key === message.replyTo)
                     }
+                    imageUrl={message.imageUrl}
                   />
                 );
               }}
@@ -146,7 +213,10 @@ export const ChatScreen = ({route, navigation}) => {
         )}
 
         <View style={styles.inputContainer}>
-          <TouchableOpacity activeOpacity={0.7} style={styles.mediaButton}>
+          <TouchableOpacity
+            onPress={pickImage}
+            activeOpacity={0.7}
+            style={styles.mediaButton}>
             <PlusCircleIcon size={28} color={Colors.primary} />
           </TouchableOpacity>
 
@@ -162,7 +232,7 @@ export const ChatScreen = ({route, navigation}) => {
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.mediaButton}
-              onPress={() => console.log('Pressed!')}>
+              onPress={takePhoto}>
               <CameraIcon size={28} color={Colors.primary} />
             </TouchableOpacity>
           )}
@@ -175,6 +245,36 @@ export const ChatScreen = ({route, navigation}) => {
               <PaperAirplaneIcon size={20} color={Colors.white} />
             </TouchableOpacity>
           )}
+          <AwesomeAlert
+            show={tempImageUri !== ''}
+            title="Send Image"
+            message="Are you sure want to send image?"
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={true}
+            showConfirmButton={true}
+            confirmText="Send image"
+            confirmButtonColor={Colors.primary}
+            cancelButtonColor={Colors.light}
+            cancelButtonTextStyle={{color: Colors.dark}}
+            titleStyle={styles.popupTitleStyle}
+            onCancelPressed={() => setTempImageUri('')}
+            onConfirmPressed={uploadImage}
+            onDismiss={() => setTempImageUri('')}
+            customView={
+              <View style={{marginVertical: 10}}>
+                {!isLoading && tempImageUri && (
+                  <Image
+                    source={{uri: tempImageUri}}
+                    style={{width: 200, height: 200}}
+                  />
+                )}
+                {isLoading && (
+                  <ActivityIndicator size="large" color={Colors.primary} />
+                )}
+              </View>
+            }
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -216,5 +316,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 50,
     padding: 8,
+  },
+  popupTitleStyle: {
+    fontFamily: 'Poppins-Medium',
+    color: Colors.dark,
   },
 });

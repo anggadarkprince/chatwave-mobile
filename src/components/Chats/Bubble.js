@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import Colors from '../Utilities/Colors';
 import {
   Menu,
@@ -43,7 +43,18 @@ const MenuItem = props => {
 };
 
 export const Bubble = props => {
-  const {text, type, messageId, userId, chatId, date, setReply, replyingTo, name} = props;
+  const {
+    text,
+    type,
+    messageId,
+    userId,
+    chatId,
+    date,
+    setReply,
+    replyingTo,
+    name,
+    imageUrl,
+  } = props;
 
   const starredMessages = useSelector(
     state => state.messages.starredMessages[chatId] ?? {},
@@ -123,6 +134,8 @@ export const Bubble = props => {
             />
           )}
           <Text style={textStyle}>{text}</Text>
+
+          {imageUrl && <Image source={{uri: imageUrl}} style={styles.image} />}
 
           <View style={styles.timeContainer}>
             {isStarred && <StarFilledIcon size={15} color={Colors.primary} />}
@@ -213,5 +226,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     color: Colors.gray,
     fontSize: 12,
+  },
+  image: {
+    height: 260,
+    width: 260,
+    borderRadius: 5,
   },
 });
