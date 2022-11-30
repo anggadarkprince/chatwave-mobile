@@ -20,7 +20,11 @@ import Colors from '../../components/Utilities/Colors';
 import {useSelector} from 'react-redux';
 import {PageContainer} from '../../components/Containers';
 import {Bubble, ReplyTo} from '../../components/Chats';
-import {createChat, sendImageMessage, sendTextMessage} from '../../utils/actions/chatActions';
+import {
+  createChat,
+  sendImageMessage,
+  sendTextMessage,
+} from '../../utils/actions/chatActions';
 import {
   launchCameraPicker,
   launchImagePicker,
@@ -45,7 +49,6 @@ export const ChatScreen = ({route, navigation}) => {
 
   const chatMessages = useSelector(state => {
     if (!chatId) {
-      console.log('no chat id');
       return [];
     }
     const chatMessagesData = state.messages.messagesData[chatId];
@@ -75,10 +78,10 @@ export const ChatScreen = ({route, navigation}) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: getChatTitleFromName(),
+      headerTitle: chatData.chatName || getChatTitleFromName(),
     });
     setChatUsers(chatData.users);
-  }, [chatData.users, chatUsers]);
+  }, [chatData.users, chatUsers, chatData.chatName]);
 
   const sendMessage = useCallback(async () => {
     if (!messageText || messageText === '') {
@@ -89,11 +92,10 @@ export const ChatScreen = ({route, navigation}) => {
       if (!id) {
         // no chat id, create the chat
         id = await createChat(userData.userId, route.params.newChatData);
-        console.log(id);
         setChatId(id);
       }
       await sendTextMessage(
-        chatId,
+        id,
         userData.userId,
         messageText,
         replyingTo && replyingTo.key,
@@ -138,7 +140,6 @@ export const ChatScreen = ({route, navigation}) => {
       if (!id) {
         // no chat id, create the chat
         id = await createChat(userData.userId, route.params.newChatData);
-        console.log(id);
         setChatId(id);
       }
 
@@ -184,11 +185,14 @@ export const ChatScreen = ({route, navigation}) => {
                 const message = itemData.item;
                 const isOwnMessage = message.sentBy === userData.userId;
                 const messageType = isOwnMessage ? 'myMessage' : 'theirMessage';
+                const sender = message.sentBy && storedUsers[message.sentBy];
+                const name = sender && `${sender.firstName} ${sender.lastName}`
                 return (
                   <Bubble
                     type={messageType}
                     text={message.text}
                     date={message.sentAt}
+                    name={chatData.isGroupChat || isOwnMessage ? undefined : name}
                     messageId={message.key}
                     userId={userData.userId}
                     chatId={chatId}
@@ -226,6 +230,7 @@ export const ChatScreen = ({route, navigation}) => {
             onChangeText={text => setMessageText(text)}
             onSubmitEditing={sendMessage}
             placeholder="Type a message..."
+            placeholderTextColor={Colors.lightGray}
           />
 
           {messageText === '' && (
@@ -305,6 +310,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5,
     fontFamily: 'Poppins-Regular',
+    color: Colors.dark,
   },
   mediaButton: {
     alignItems: 'center',

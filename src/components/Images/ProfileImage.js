@@ -1,12 +1,22 @@
 import React, {useState} from 'react';
-import {Image, View, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {
+  Image,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import userImage from '../../../assets/images/user.jpg';
-import Colors from "../Utilities/Colors";
-import {PencilSquareIcon} from "react-native-heroicons/outline";
-import {launchImagePicker, uploadImageAsync} from "../../utils/imagePickerHelper";
-import {updateSignedInUserData} from "../../utils/actions/authActions";
-import {updateLoggedInUserData} from "../../store/authSlice";
-import {useDispatch} from "react-redux";
+import Colors from '../Utilities/Colors';
+import { PencilSquareIcon, XCircleIcon } from "react-native-heroicons/outline";
+import {
+  launchImagePicker,
+  uploadImageAsync,
+} from '../../utils/imagePickerHelper';
+import {updateSignedInUserData} from '../../utils/actions/authActions';
+import {updateLoggedInUserData} from '../../store/authSlice';
+import {useDispatch} from 'react-redux';
+import { XMarkIcon } from "react-native-heroicons/solid";
 
 export const ProfileImage = props => {
   const source = props.uri ? {uri: props.uri} : userImage;
@@ -15,6 +25,7 @@ export const ProfileImage = props => {
   const dispatch = useDispatch();
 
   const showEditButton = props?.showEditButton && props.showEditButton === true;
+  const showRemoveButton = props?.showRemoveButton && props.showRemoveButton === true;
   const userId = props.userId;
 
   const pickImage = async () => {
@@ -28,7 +39,7 @@ export const ProfileImage = props => {
         const uploadUrl = await uploadImageAsync(pickedImage);
         if (!uploadUrl) {
           setIsLoading(false);
-          throw new Error("Could not upload image");
+          throw new Error('Could not upload image');
         }
 
         const newData = {profilePicture: uploadUrl};
@@ -40,18 +51,44 @@ export const ProfileImage = props => {
     }
   };
 
-  const Container = showEditButton ? TouchableOpacity : View;
+  const Container = showEditButton || props.onPress ? TouchableOpacity : View;
 
   return (
-    <Container onPress={pickImage} activeOpacity={0.75} disabled={isLoading} style={[styles.container, {width: props.size + 4, height: props.size + 4, borderRadius: (props.size + 4) / 2}]}>
+    <Container
+      onPress={props.onPress || pickImage}
+      activeOpacity={0.75}
+      disabled={isLoading}
+      style={[
+        styles.container,
+        props.style,
+        {
+          width: props.size + 4,
+          height: props.size + 4,
+          borderRadius: (props.size + 4) / 2,
+        },
+      ]}>
       <Image
-        style={{...styles.image, ...{width: props.size, height: props.size, borderRadius: props.size / 2}}}
+        style={{
+          ...styles.image,
+          ...{
+            width: props.size,
+            height: props.size,
+            borderRadius: props.size / 2,
+          },
+        }}
         source={image}
       />
 
       {isLoading && (
         <ActivityIndicator
-          style={[styles.loading, {width: props.size, height: props.size, borderRadius: props.size / 2}]}
+          style={[
+            styles.loading,
+            {
+              width: props.size,
+              height: props.size,
+              borderRadius: props.size / 2,
+            },
+          ]}
           color={Colors.primary}
           size="large"
         />
@@ -59,11 +96,17 @@ export const ProfileImage = props => {
 
       {showEditButton && !isLoading && (
         <View style={styles.editIconContainer}>
-          <PencilSquareIcon size={18} color={Colors.dark}/>
+          <PencilSquareIcon size={18} color={Colors.dark} />
+        </View>
+      )}
+
+      {showRemoveButton && !isLoading && (
+        <View style={styles.removeIconContainer}>
+          <XMarkIcon size={12} color={Colors.white} />
         </View>
       )}
     </Container>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
@@ -83,7 +126,15 @@ const styles = StyleSheet.create({
     right: -5,
     backgroundColor: Colors.fade,
     borderRadius: 20,
-    padding: 8
+    padding: 8,
+  },
+  removeIconContainer: {
+    position: 'absolute',
+    bottom: -3,
+    right: -3,
+    backgroundColor: Colors.danger,
+    borderRadius: 20,
+    padding: 3,
   },
   loading: {
     position: 'absolute',
@@ -92,4 +143,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFFAA',
     borderRadius: 75,
   },
-})
+});
