@@ -31,6 +31,8 @@ import {
   uploadImageAsync,
 } from '../../utils/imagePickerHelper';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import {HeaderButtons, Item} from 'react-navigation-header-buttons';
+import {CustomHeaderButton} from '../../components/Title';
 
 export const ChatScreen = ({route, navigation}) => {
   const userData = useSelector(state => state.auth.userData);
@@ -79,6 +81,25 @@ export const ChatScreen = ({route, navigation}) => {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: chatData.chatName || getChatTitleFromName(),
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+            {chatId && (
+              <Item
+                title="Chat settings"
+                iconName="cog-6-tooth"
+                onPress={() =>
+                  chatData.isGroupChat
+                    ? navigation.navigate('')
+                    : navigation.navigate('Contact', {
+                        uid: chatUsers.find(uid => uid !== userData.userId),
+                      })
+                }
+              />
+            )}
+          </HeaderButtons>
+        );
+      },
     });
     setChatUsers(chatData.users);
   }, [chatData.users, chatUsers, chatData.chatName]);

@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import Colors from '../../Utilities/Colors';
 import {ProfileImage} from '../../Images';
-import {CheckIcon} from 'react-native-heroicons/outline';
+import {CheckIcon, ChevronRightIcon} from 'react-native-heroicons/outline';
 
 export const DataItem = props => {
   const {title, subTitle, image, onPress, type, isChecked} = props;
@@ -22,7 +22,15 @@ export const DataItem = props => {
         </View>
         {type === 'checkbox' && (
           <View style={[styles.iconContainer, isChecked && styles.checked]}>
-            <CheckIcon size={14} color={isChecked ? Colors.white : Colors.darkGray} />
+            <CheckIcon
+              size={14}
+              color={isChecked ? Colors.white : Colors.darkGray}
+            />
+          </View>
+        )}
+        {type === 'link' && (
+          <View>
+            <ChevronRightIcon size={14} color={Colors.darkGray} />
           </View>
         )}
       </View>
