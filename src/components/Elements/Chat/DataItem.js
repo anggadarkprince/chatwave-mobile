@@ -3,22 +3,37 @@ import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import Colors from '../../Utilities/Colors';
 import {ProfileImage} from '../../Images';
 import {CheckIcon, ChevronRightIcon} from 'react-native-heroicons/outline';
+import {HeroIcon} from '../../Icons';
+
+const imageSize = 40;
 
 export const DataItem = props => {
-  const {title, subTitle, image, onPress, type, isChecked} = props;
+  const {title, subTitle, image, onPress, type, isChecked, icon} = props;
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        <ProfileImage uri={image} size={42} />
+        {!icon && <ProfileImage uri={image} size={42} />}
+        {icon && (
+          <View style={styles.leftIconContainer}>
+            <HeroIcon name={icon} size={20} color={Colors.primary} />
+          </View>
+        )}
 
         <View style={styles.textContainer}>
-          <Text numberOfLines={1} style={styles.title}>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.title,
+              {color: type === 'button' ? Colors.primary : Colors.dark},
+            ]}>
             {title}
           </Text>
-          <Text numberOfLines={1} style={styles.subTitle}>
-            {subTitle}
-          </Text>
+          {subTitle && (
+            <Text numberOfLines={1} style={styles.subTitle}>
+              {subTitle}
+            </Text>
+          )}
         </View>
         {type === 'checkbox' && (
           <View style={[styles.iconContainer, isChecked && styles.checked]}>
@@ -72,5 +87,13 @@ const styles = StyleSheet.create({
   checked: {
     backgroundColor: Colors.primary,
     borderColor: 'transparent',
+  },
+  leftIconContainer: {
+    backgroundColor: Colors.fadePrimary,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: imageSize,
+    height: imageSize,
   },
 });

@@ -16,7 +16,8 @@ import {
 import {updateSignedInUserData} from '../../utils/actions/authActions';
 import {updateLoggedInUserData} from '../../store/authSlice';
 import {useDispatch} from 'react-redux';
-import { XMarkIcon } from "react-native-heroicons/solid";
+import {XMarkIcon} from 'react-native-heroicons/solid';
+import {updateChatData} from '../../utils/actions/chatActions';
 
 export const ProfileImage = props => {
   const source = props.uri ? {uri: props.uri} : userImage;
@@ -26,7 +27,9 @@ export const ProfileImage = props => {
 
   const showEditButton = props?.showEditButton && props.showEditButton === true;
   const showRemoveButton = props?.showRemoveButton && props.showRemoveButton === true;
+
   const userId = props.userId;
+  const chatId = props.chatId;
 
   const pickImage = async () => {
     const result = await launchImagePicker();
@@ -36,15 +39,23 @@ export const ProfileImage = props => {
       if (!result.didCancel && result.assets) {
         const pickedImage = result.assets[0].uri;
         setIsLoading(true);
-        const uploadUrl = await uploadImageAsync(pickedImage);
+        const uploadUrl = await uploadImageAsync(
+          pickedImage,
+          chatId !== undefined,
+        );
         if (!uploadUrl) {
           setIsLoading(false);
           throw new Error('Could not upload image');
         }
 
-        const newData = {profilePicture: uploadUrl};
-        dispatch(updateLoggedInUserData({newData: newData}));
-        await updateSignedInUserData(userId, newData);
+        if (chatId) {
+          await updateChatData(chatId, userId, {chatImage: uploadUrl});
+        } else {
+          const newData = {profilePicture: uploadUrl};
+          await updateSignedInUserData(userId, newData);
+          dispatch(updateLoggedInUserData({newData: newData}));
+        }
+
         setImage({uri: uploadUrl});
         setIsLoading(false);
       }

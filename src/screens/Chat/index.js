@@ -90,7 +90,7 @@ export const ChatScreen = ({route, navigation}) => {
                 iconName="cog-6-tooth"
                 onPress={() =>
                   chatData.isGroupChat
-                    ? navigation.navigate('')
+                    ? navigation.navigate('ChatSetting', {chatId: chatId})
                     : navigation.navigate('Contact', {
                         uid: chatUsers.find(uid => uid !== userData.userId),
                       })

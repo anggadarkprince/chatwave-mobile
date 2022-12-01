@@ -40,6 +40,21 @@ export const sendTextMessage = async (
   await sendMessage(chatId, senderId, messageText, null, replyTo);
 };
 
+export const updateChatData = async (chatId, userId, chatData) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const chatRef = child(dbRef, `chats/${chatId}`);
+    await update(chatRef, {
+      ...chatData,
+      updatedAt: new Date().toISOString(),
+      updatedBy: userId,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const sendImageMessage = async (
   chatId,
   senderId,

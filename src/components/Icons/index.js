@@ -2,13 +2,16 @@ import React from 'react';
 import {
   Cog6ToothIcon,
   PencilSquareIcon,
-  PlusCircleIcon,
+  PlusCircleIcon, PlusIcon,
   XMarkIcon,
 } from 'react-native-heroicons/outline';
 
 export const HeroIcon = ({name, ...rest}) => {
   if (name === 'plus-circle') {
     return <PlusCircleIcon {...rest} />;
+  }
+  if (name === 'plus') {
+    return <PlusIcon {...rest} />;
   }
   if (name === 'pencil-square') {
     return <PencilSquareIcon {...rest} />;
