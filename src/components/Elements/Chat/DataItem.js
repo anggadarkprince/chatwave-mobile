@@ -9,11 +9,12 @@ const imageSize = 40;
 
 export const DataItem = props => {
   const {title, subTitle, image, onPress, type, isChecked, icon} = props;
+  const hideImage = props.hideImage && props.hideImage === true;
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        {!icon && <ProfileImage uri={image} size={42} />}
+        {!icon && !hideImage && <ProfileImage uri={image} size={42} />}
         {icon && (
           <View style={styles.leftIconContainer}>
             <HeroIcon name={icon} size={20} color={Colors.primary} />

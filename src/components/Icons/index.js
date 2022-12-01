@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ChevronDownIcon,
   Cog6ToothIcon,
   PencilSquareIcon,
   PlusCircleIcon, PlusIcon,
@@ -21,5 +22,8 @@ export const HeroIcon = ({name, ...rest}) => {
   }
   if (name === 'cog-6-tooth') {
     return <Cog6ToothIcon {...rest} />;
+  }
+  if (name === 'chevron-down') {
+    return <ChevronDownIcon {...rest} />;
   }
 };

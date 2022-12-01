@@ -21,6 +21,7 @@ import {setStoredUsers} from '../store/userSlice';
 import {setChatMessages, setStarredMessages} from '../store/messagesSlice';
 import {ContactScreen} from "../screens/Contact";
 import {ChatSettingScreen} from "../screens/Chat/ChatSetting";
+import {UserListScreen} from "../screens/Chat/UserList";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -140,6 +141,15 @@ const StackNavigator = () => {
         <Stack.Screen
           name="ChatSetting"
           component={ChatSettingScreen}
+          options={{
+            title: '',
+            headerBackTitle: 'Back',
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="UserList"
+          component={UserListScreen}
           options={{
             title: '',
             headerBackTitle: 'Back',

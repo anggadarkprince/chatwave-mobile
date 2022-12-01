@@ -19,7 +19,10 @@ import {ProfileImage} from '../../components/Images';
 import {TextInput} from '../../components/Inputs';
 import {reducer} from '../../utils/reducers/formReducer';
 import {validateInput} from '../../utils/actions/formActions';
-import {removeUserFromChat, updateChatData} from '../../utils/actions/chatActions';
+import {
+  removeUserFromChat,
+  updateChatData,
+} from '../../utils/actions/chatActions';
 import Colors from '../../components/Utilities/Colors';
 import {SubmitButton} from '../../components/Buttons';
 import {DataItem} from '../../components/Elements/Chat/DataItem';
@@ -119,7 +122,7 @@ export const ChatSettingScreen = ({navigation, route}) => {
 
           <DataItem title="Add users" icon="plus" type="button" />
 
-          {chatData.users.map(uid => {
+          {chatData.users.slice(0, 4).map(uid => {
             const currentUser = storedUsers[uid];
             return (
               <DataItem
@@ -135,6 +138,21 @@ export const ChatSettingScreen = ({navigation, route}) => {
               />
             );
           })}
+          {chatData.users.length > 4 && (
+            <DataItem
+              type="link"
+              title="View All"
+              hideImage={true}
+              onPress={() => {
+                navigation.navigate('UserList', {
+                  data: chatData.users,
+                  type: 'users',
+                  chatId: chatId,
+                  title: 'Participants',
+                });
+              }}
+            />
+          )}
         </View>
 
         {showSuccessMessage && <Text>Chat setting is saved!</Text>}
