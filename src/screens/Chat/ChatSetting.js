@@ -19,7 +19,7 @@ import {ProfileImage} from '../../components/Images';
 import {TextInput} from '../../components/Inputs';
 import {reducer} from '../../utils/reducers/formReducer';
 import {validateInput} from '../../utils/actions/formActions';
-import {updateChatData} from '../../utils/actions/chatActions';
+import {removeUserFromChat, updateChatData} from '../../utils/actions/chatActions';
 import Colors from '../../components/Utilities/Colors';
 import {SubmitButton} from '../../components/Buttons';
 import {DataItem} from '../../components/Elements/Chat/DataItem';
@@ -29,7 +29,7 @@ export const ChatSettingScreen = ({navigation, route}) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const chatId = route.params.chatId;
-  const chatData = useSelector(state => state.chats.chatsData[chatId]);
+  const chatData = useSelector(state => state.chats.chatsData[chatId] || {});
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.users.storedUsers);
 
@@ -77,6 +77,21 @@ export const ChatSettingScreen = ({navigation, route}) => {
     return currentValues.chatName !== chatData.chatName;
   };
 
+  const leaveChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      await removeUserFromChat(userData, userData, chatData);
+      navigation.popToTop();
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  }, [navigation]);
+
+  if (!chatData.users) {
+    return null;
+  }
+
   return (
     <PageContainer>
       <PageTitle text="Chat Settings" />
@@ -115,7 +130,7 @@ export const ChatSettingScreen = ({navigation, route}) => {
                 type={uid !== userData.userId && 'link'}
                 onPress={() =>
                   uid !== userData.userId &&
-                  navigation.navigate('Contact', {uid})
+                  navigation.navigate('Contact', {uid, chatId})
                 }
               />
             );
@@ -137,6 +152,15 @@ export const ChatSettingScreen = ({navigation, route}) => {
           )
         )}
       </ScrollView>
+
+      {
+        <SubmitButton
+          title="Leave chat"
+          color={Colors.danger}
+          onPress={() => leaveChat()}
+          style={{marginBottom: 20}}
+        />
+      }
     </PageContainer>
   );
 };

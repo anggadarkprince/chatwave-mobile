@@ -5,8 +5,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState, useReducer, useCallback, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {PageContainer} from '../../components/Containers';
 import {PageTitle} from '../../components/Title';
 import {useSelector} from 'react-redux';
@@ -14,12 +15,20 @@ import {ProfileImage} from '../../components/Images';
 import Colors from '../../components/Utilities/Colors';
 import {getUserChats} from '../../utils/actions/userActions';
 import {DataItem} from '../../components/Elements/Chat/DataItem';
+import {SubmitButton} from '../../components/Buttons';
+import {removeUserFromChat} from '../../utils/actions/chatActions';
 
 export const ContactScreen = ({navigation, route}) => {
+  const [isLoading, setIsLoading] = useState(false);
   const storedUsers = useSelector(state => state.users.storedUsers);
+  const userData = useSelector(state => state.auth.userData);
   const currentUser = storedUsers[route?.params?.uid];
+
   const storedChats = useSelector(state => state.chats.chatsData);
   const [commonChats, setCommonChats] = useState([]);
+
+  const chatId = route?.params?.chatId;
+  const chatData = chatId && storedChats[chatId];
 
   useEffect(() => {
     const getCommonChats = async () => {
@@ -32,6 +41,17 @@ export const ContactScreen = ({navigation, route}) => {
     };
     getCommonChats();
   }, []);
+
+  const removeFromChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      await removeUserFromChat(userData, currentUser, chatData);
+      navigation.goBack();
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  }, [navigation]);
 
   return (
     <PageContainer>
@@ -63,20 +83,32 @@ export const ContactScreen = ({navigation, route}) => {
                 {commonChats.length === 1 ? 'Group' : 'Groups'} in common
               </Text>
               {commonChats.map(cid => {
-                const chatData = storedChats[cid];
+                const chatItem = storedChats[cid];
                 return (
                   <DataItem
                     key={cid}
-                    title={chatData.chatName}
-                    subtitle={chatData.latestMessageText}
+                    title={chatItem.chatName}
+                    subtitle={chatItem.latestMessageText}
                     type="link"
                     onPress={() => navigation.push('Chat', {chatId: cid})}
-                    image={chatData.chatImage}
+                    image={chatItem.chatImage}
                   />
                 );
               })}
             </>
           )}
+
+          {chatData &&
+            chatData.isGroupChat &&
+            (isLoading ? (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            ) : (
+              <SubmitButton
+                title="Remove from chat"
+                color={Colors.danger}
+                onPress={removeFromChat}
+              />
+            ))}
         </KeyboardAvoidingView>
       </ScrollView>
     </PageContainer>

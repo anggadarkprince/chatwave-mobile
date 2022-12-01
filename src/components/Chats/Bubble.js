@@ -101,6 +101,11 @@ export const Bubble = props => {
     case 'reply':
       bubbleStyle.backgroundColor = '#f2f2f2';
       break;
+    case 'info':
+      bubbleStyle.backgroundColor = Colors.white;
+      bubbleStyle.alignItems = 'center';
+      textStyle.color = Colors.dark;
+      break;
     default:
       break;
   }
@@ -125,7 +130,7 @@ export const Bubble = props => {
         activeOpacity={0.8}
         style={[type !== 'reply' && styles.menuContainer, wrapperStyle]}>
         <View style={bubbleStyle}>
-          {name && <Text style={styles.name}>{name}</Text>}
+          {name && type !== 'info' && <Text style={styles.name}>{name}</Text>}
           {replyingToUser && (
             <Bubble
               type="reply"
@@ -139,7 +144,7 @@ export const Bubble = props => {
 
           <View style={styles.timeContainer}>
             {isStarred && <StarFilledIcon size={15} color={Colors.primary} />}
-            {dateString && (
+            {dateString && type !== 'info' && (
               <Text style={[styles.time, isStarred && {marginLeft: 5}]}>
                 {dateString}
               </Text>

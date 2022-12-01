@@ -68,7 +68,8 @@ export const ChatScreen = ({route, navigation}) => {
     return messageList;
   });
 
-  const chatData = (chatId && storedChats[chatId]) || route?.params?.newChatData;
+  const chatData =
+    (chatId && storedChats[chatId]) || route?.params?.newChatData || {};
 
   const getChatTitleFromName = () => {
     const otherUserId = chatUsers.find(uid => uid !== userData.userId);
@@ -79,6 +80,10 @@ export const ChatScreen = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    if (!chatData) {
+      return;
+    }
+
     navigation.setOptions({
       headerTitle: chatData.chatName || getChatTitleFromName(),
       headerRight: () => {
@@ -196,8 +201,10 @@ export const ChatScreen = ({route, navigation}) => {
           )}
           {chatId && (
             <FlatList
-              ref={(ref) => flatList.current = ref}
-              onContentSizeChange={() => flatList.current.scrollToEnd({animated: false})}
+              ref={ref => (flatList.current = ref)}
+              onContentSizeChange={() =>
+                flatList.current.scrollToEnd({animated: false})
+              }
               onLayout={() => flatList.current.scrollToEnd({animated: false})}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{paddingVertical: 15}}
@@ -205,15 +212,24 @@ export const ChatScreen = ({route, navigation}) => {
               renderItem={itemData => {
                 const message = itemData.item;
                 const isOwnMessage = message.sentBy === userData.userId;
-                const messageType = isOwnMessage ? 'myMessage' : 'theirMessage';
+                let messageType;
+                if (message.type && message.type === 'info') {
+                  messageType = 'info';
+                } else if (isOwnMessage) {
+                  messageType = 'myMessage';
+                } else {
+                  messageType = 'theirMessage';
+                }
                 const sender = message.sentBy && storedUsers[message.sentBy];
-                const name = sender && `${sender.firstName} ${sender.lastName}`
+                const name = sender && `${sender.firstName} ${sender.lastName}`;
                 return (
                   <Bubble
                     type={messageType}
                     text={message.text}
                     date={message.sentAt}
-                    name={chatData.isGroupChat || isOwnMessage ? undefined : name}
+                    name={
+                      chatData.isGroupChat || isOwnMessage ? undefined : name
+                    }
                     messageId={message.key}
                     userId={userData.userId}
                     chatId={chatId}
