@@ -20,6 +20,7 @@ import {TextInput} from '../../components/Inputs';
 import {reducer} from '../../utils/reducers/formReducer';
 import {validateInput} from '../../utils/actions/formActions';
 import {
+  addUsersToChat,
   removeUserFromChat,
   updateChatData,
 } from '../../utils/actions/chatActions';
@@ -43,6 +44,26 @@ export const ChatSettingScreen = ({navigation, route}) => {
   };
 
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
+
+  const selectedUsers = route.params && route.params?.selectedUsers;
+  useEffect(() => {
+    if (!selectedUsers) {
+      return;
+    }
+    const selectedUserData = [];
+    selectedUsers.forEach(uid => {
+      if (uid === userData.userId) {
+        return;
+      }
+      if (!storedUsers[uid]) {
+        console.log('No user data found in the data store');
+        return;
+      }
+
+      selectedUserData.push(storedUsers[uid]);
+    });
+    addUsersToChat(userData, selectedUserData, chatData);
+  }, [selectedUsers]);
 
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
@@ -120,7 +141,19 @@ export const ChatSettingScreen = ({navigation, route}) => {
             {chatData.users.length} Participants
           </Text>
 
-          <DataItem title="Add users" icon="plus" type="button" />
+          <DataItem
+            title="Add users"
+            icon="plus"
+            type="button"
+            onPress={() =>
+              navigation.navigate('NewChat', {
+                isGroupChat: true,
+                title: 'Add Users',
+                existingUsers: chatData.users,
+                chatId,
+              })
+            }
+          />
 
           {chatData.users.slice(0, 4).map(uid => {
             const currentUser = storedUsers[uid];

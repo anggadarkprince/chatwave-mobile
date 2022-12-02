@@ -32,9 +32,13 @@ export const NewChatScreen = ({navigation, route}) => {
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.users.storedUsers);
   const dispatch = useDispatch();
-  const isGroupChat = route?.params?.isGroupChat;
-  const isGroupChatDisabled = selectedUsers.length === 0 || chatName === '';
 
+  const chatId = route.params && route.params.chatId;
+  const existingUsers = route.params && route.params.existingUsers;
+  const isGroupChat = route?.params?.isGroupChat;
+  const isGroupChatDisabled = selectedUsers.length === 0 || (isNewChat && chatName === '');
+
+  const isNewChat = !chatId;
   const selectedUsersFlatList = useRef();
 
   useEffect(() => {
@@ -55,13 +59,15 @@ export const NewChatScreen = ({navigation, route}) => {
           <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
             {isGroupChat && (
               <Item
-                title="Create"
+                title={isNewChat ? 'Create' : 'Add'}
                 disabled={isGroupChatDisabled}
                 color={isGroupChatDisabled ? Colors.lightGray : undefined}
                 onPress={() => {
-                  navigation.navigate('ChatList', {
+                  const screenName = isNewChat ? 'ChatList' : 'ChatSetting';
+                  navigation.navigate(screenName, {
                     selectedUsers: selectedUsers,
                     chatName: chatName,
+                    chatId: chatId,
                   });
                 }}
               />
@@ -69,7 +75,7 @@ export const NewChatScreen = ({navigation, route}) => {
           </HeaderButtons>
         );
       },
-      headerTitle: isGroupChat ? 'Add Participants' : 'New chat',
+      headerTitle: isGroupChat ? route?.params?.title || 'Add Participants' : 'New chat',
     });
   }, [navigation, isGroupChatDisabled]);
 
@@ -137,6 +143,10 @@ export const NewChatScreen = ({navigation, route}) => {
               const userId = itemData.item;
               const userData = users[userId];
 
+              if (existingUsers && existingUsers.includes(userId)) {
+                return;
+              }
+
               return (
                 <DataItem
                   title={`${userData.firstName} ${userData.lastName}`}
@@ -156,7 +166,7 @@ export const NewChatScreen = ({navigation, route}) => {
 
   return (
     <PageContainer>
-      {isGroupChat && (
+      {isNewChat && isGroupChat && (
         <>
           <View style={styles.chatNameContainer}>
             <View style={styles.inputContainer}>
