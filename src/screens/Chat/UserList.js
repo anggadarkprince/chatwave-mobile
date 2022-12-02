@@ -10,6 +10,7 @@ export const UserListScreen = ({navigation, route}) => {
   const chatData = useSelector(state => state.chats.chatsData[chatId] || {});
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.users.storedUsers);
+  const messagesData = useSelector(state => state.messages.messagesData);
 
   useEffect(() => {
     navigation.setOptions({
@@ -20,7 +21,11 @@ export const UserListScreen = ({navigation, route}) => {
   return (
     <PageContainer>
       <View style={styles.sectionContainer}>
-        <Text style={styles.heading}>{chatData.users.length} Participants</Text>
+        {type === 'users' && (
+          <Text style={styles.heading}>
+            {chatData.users.length} Participants
+          </Text>
+        )}
 
         <FlatList
           contentContainerStyle={styles.scrollView}
@@ -46,6 +51,24 @@ export const UserListScreen = ({navigation, route}) => {
                 : () =>
                     uid !== userData.userId &&
                     navigation.navigate('Contact', {uid, chatId});
+            } else if (type === 'messages') {
+              const starData = itemData.item;
+              const {chatId, messageId} = starData;
+              const messagesForChat = messagesData[chatId];
+
+              if (!messagesForChat) {
+                return;
+              }
+
+              const messageData = messagesForChat[messageId];
+              const sender = messageData.sentBy && storedUsers[messageData.sentBy];
+              const name = sender && `${sender.firstName} ${sender.lastName}`;
+
+              key = messageId;
+              title = name;
+              subtitle = messageData.text;
+              itemType = '';
+              onPress = () => {};
             }
             return (
               <DataItem
@@ -59,23 +82,6 @@ export const UserListScreen = ({navigation, route}) => {
             );
           }}
         />
-
-        {chatData.users.map(uid => {
-          const currentUser = storedUsers[uid];
-          return (
-            <DataItem
-              key={uid}
-              image={currentUser.profilePicture}
-              title={`${currentUser.firstName} ${currentUser.lastName}`}
-              subtitle={currentUser.about}
-              type={uid !== userData.userId && 'link'}
-              onPress={() =>
-                uid !== userData.userId &&
-                navigation.navigate('Contact', {uid, chatId})
-              }
-            />
-          );
-        })}
       </View>
     </PageContainer>
   );

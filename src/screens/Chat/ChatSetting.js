@@ -36,6 +36,7 @@ export const ChatSettingScreen = ({navigation, route}) => {
   const chatData = useSelector(state => state.chats.chatsData[chatId] || {});
   const userData = useSelector(state => state.auth.userData);
   const storedUsers = useSelector(state => state.users.storedUsers);
+  const starredMessages = useSelector(state => state.messages.starredMessages[chatId] ?? {});
 
   const initialState = {
     inputValues: {chatName: chatData.chatName},
@@ -203,6 +204,19 @@ export const ChatSettingScreen = ({navigation, route}) => {
           )
         )}
       </ScrollView>
+
+      <DataItem
+        type="link"
+        title="Starred messages"
+        hideImage={true}
+        onPress={() => {
+          navigation.navigate('UserList', {
+            title: 'Starred messages',
+            data: Object.values(starredMessages),
+            type: 'messages',
+          });
+        }}
+      />
 
       {
         <SubmitButton

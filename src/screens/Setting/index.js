@@ -6,7 +6,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import React, {useState, useReducer, useCallback} from 'react';
+import React, {useState, useReducer, useCallback, useMemo} from 'react';
 import {PageTitle} from '../../components/Title';
 import {PageContainer} from '../../components/Containers';
 import {TextInput} from '../../components/Inputs';
@@ -27,12 +27,30 @@ import {
   userLogout,
 } from '../../utils/actions/authActions';
 import {ProfileImage} from '../../components/Images';
+import {DataItem} from '../../components/Elements/Chat/DataItem';
 
-export const SettingScreen = () => {
+export const SettingScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const userData = useSelector(state => state.auth.userData);
   const dispatch = useDispatch();
+
+  const starredMessages = useSelector(
+    state => state.messages.starredMessages ?? {},
+  );
+
+  const sortedStarredMessages = useMemo(() => {
+    let result = [];
+
+    const chats = Object.values(starredMessages);
+
+    chats.forEach(chat => {
+      const chatMessages = Object.values(chat);
+      result = result.concat(chatMessages);
+    });
+
+    return result;
+  }, [starredMessages]);
 
   const firstName = userData.firstName || '';
   const lastName = userData.lastName || '';
@@ -174,7 +192,18 @@ export const SettingScreen = () => {
             disabled={!formState.formIsValid}
           />
         )}
-
+        <DataItem
+          type="link"
+          title="Starred messages"
+          hideImage={true}
+          onPress={() =>
+            navigation.navigate('UserList', {
+              title: 'Starred messages',
+              data: sortedStarredMessages,
+              type: 'messages',
+            })
+          }
+        />
         <SubmitButton
           title="Logout"
           onPress={() => dispatch(userLogout())}
